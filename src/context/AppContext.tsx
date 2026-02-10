@@ -90,7 +90,11 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
 
     case 'DISMISS_EVOLUTION':
-      return { ...state, overlay: 'result', previousEvolutionLevel: state.evolutionLevel };
+      return {
+        ...state,
+        overlay: state.selectedAuraId ? 'aura-detail' : 'result',
+        previousEvolutionLevel: state.evolutionLevel,
+      };
 
     case 'DISMISS_ONBOARDING':
       return { ...state, showOnboarding: false };
