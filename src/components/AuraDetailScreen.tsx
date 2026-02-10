@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 import { auraTypes } from '../data/aura-types';
 import { EVOLUTION_STAGES } from '../data/evolution-stages';
 import { getEnergyPartner } from '../utils/aura-engine';
+import { getFeedsInLevel, FEEDS_PER_LEVEL, AD_FEED_INDEX, manualFeedMascot, calcEvolutionLevel } from '../utils/storage';
 import { EvolutionLevel } from '../types';
 import { levelQuotes } from '../data/mascot-dialogues';
+import { useInterstitialAd } from '../hooks/useInterstitialAd';
 import { SparkleIcon } from './BrandIcons';
+
+const AD_GROUP_ID = 'ait-ad-test-interstitial-id';
 
 const AuraDetailScreen: React.FC = () => {
   const { state, dispatch } = useApp();
@@ -15,9 +19,38 @@ const AuraDetailScreen: React.FC = () => {
   const aura = auraTypes.find(a => a.id === auraId);
   if (!aura) return null;
 
-  const [selectedLevel, setSelectedLevel] = useState<EvolutionLevel>(state.evolutionLevel);
+  const isMascotAura = auraId === state.mascot.auraId;
+  const auraEntry = state.collection.entries.find(e => e.auraId === auraId);
+  const auraExp = auraEntry?.exp ?? 0;
+  const auraLevel = calcEvolutionLevel(auraExp);
+
+  const [selectedLevel, setSelectedLevel] = useState<EvolutionLevel>(isMascotAura ? state.evolutionLevel : auraLevel);
+  const [feeding, setFeeding] = useState(false);
+  const { loading: adLoading, showInterstitialAd } = useInterstitialAd(AD_GROUP_ID);
   const entry = state.collection.entries.find(e => e.auraId === auraId);
   const partner = getEnergyPartner(auraId);
+
+  const feedsInLevel = isMascotAura ? getFeedsInLevel(state.mascot.exp, state.evolutionLevel) : 0;
+  const isMaxLevel = isMascotAura ? state.evolutionLevel >= 4 : false;
+  const needsAd = feedsInLevel === AD_FEED_INDEX;
+
+  const handleFeed = useCallback(async () => {
+    if (feeding || isMaxLevel || !isMascotAura) return;
+    const doFeed = async () => {
+      setFeeding(true);
+      try {
+        const result = await manualFeedMascot();
+        dispatch({ type: 'MANUAL_FEED', payload: result });
+      } finally {
+        setFeeding(false);
+      }
+    };
+    if (needsAd) {
+      showInterstitialAd({ onDismiss: doFeed });
+    } else {
+      await doFeed();
+    }
+  }, [feeding, isMaxLevel, isMascotAura, needsAd, showInterstitialAd, dispatch]);
 
   const handleBack = () => {
     dispatch({ type: 'SELECT_AURA', payload: null });
@@ -109,7 +142,7 @@ const AuraDetailScreen: React.FC = () => {
           <div className="flex gap-3 overflow-x-auto pb-2 px-2 snap-x snap-mandatory no-scrollbar">
             {([0, 1, 2, 3, 4] as EvolutionLevel[]).map((level) => {
               const evoStage = EVOLUTION_STAGES[level];
-              const isUnlocked = level <= state.evolutionLevel;
+              const isUnlocked = level <= auraLevel;
               const isSelected = level === selectedLevel;
               return (
                 <button
@@ -150,6 +183,48 @@ const AuraDetailScreen: React.FC = () => {
             })}
           </div>
         </div>
+
+        {/* Feed section — only for mascot aura */}
+        {isMascotAura && !isMaxLevel && (
+          <div className="w-full mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-primary">기운이 진화 게이지</span>
+              <span className="text-xs text-[#1A0B3E]/40">{feedsInLevel}/{FEEDS_PER_LEVEL}</span>
+            </div>
+            <div className="w-full h-2.5 bg-surface rounded-full overflow-hidden mb-3">
+              {Array.from({ length: FEEDS_PER_LEVEL }).map((_, i) => (
+                <div
+                  key={i}
+                  className="inline-block h-full transition-all duration-300"
+                  style={{
+                    width: `${100 / FEEDS_PER_LEVEL}%`,
+                    background: i < feedsInLevel ? aura.themeColor : 'transparent',
+                    opacity: i < feedsInLevel ? 1 : 0.15,
+                    borderRight: i < FEEDS_PER_LEVEL - 1 ? '1.5px solid var(--bg)' : 'none',
+                  }}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={handleFeed}
+              disabled={feeding || adLoading}
+              className="w-full py-3.5 rounded-2xl font-bold text-sm text-white transition-transform active:scale-95 disabled:opacity-50"
+              style={{ background: aura.themeColor, fontFamily: 'var(--font)' }}
+            >
+              {needsAd && <span className="ad-badge mr-1.5">AD</span>}
+              {feeding ? '기운 주는 중...' : `기운이에게 기운 주기 (${feedsInLevel}/${FEEDS_PER_LEVEL})`}
+            </button>
+            <p className="text-center text-[10px] text-[#1A0B3E]/25 mt-1.5">
+              기운 모으기 중 1회는 광고가 포함돼요
+            </p>
+          </div>
+        )}
+        {isMascotAura && isMaxLevel && (
+          <div className="w-full mb-6 text-center">
+            <span className="text-xs font-bold text-primary">완성 단계 달성!</span>
+          </div>
+        )}
 
         {/* Quote */}
         <div className="w-full rounded-2xl px-5 py-4 mb-6" style={{ background: 'var(--surface)' }}>
