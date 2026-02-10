@@ -8,7 +8,7 @@ import { levelQuotes } from '../data/mascot-dialogues';
 import { SparkleIcon, ShareIcon } from './BrandIcons';
 import GrowthCard from './GrowthCard';
 
-const AD_GROUP_ID = 'ait-ad-test-interstitial-id';
+const AD_GROUP_ID = 'ait.v2.live.d247867a61d14ac9';
 
 const ResultScreen: React.FC<{ onRetry: () => void }> = ({ onRetry }) => {
   const { state, dispatch } = useApp();

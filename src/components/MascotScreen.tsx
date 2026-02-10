@@ -8,7 +8,7 @@ import { useInterstitialAd } from '../hooks/useInterstitialAd';
 import { SparkleIcon, FlameIcon } from './BrandIcons';
 import GrowthCard from './GrowthCard';
 
-const AD_GROUP_ID = 'ait-ad-test-interstitial-id';
+const AD_GROUP_ID = 'ait.v2.live.d247867a61d14ac9';
 
 const MascotScreen: React.FC = () => {
   const { state, dispatch } = useApp();
