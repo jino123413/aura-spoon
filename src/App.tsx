@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { getAuraForName, getDailyQuote } from './utils/aura-engine';
-import { loadAllState, saveTodayAndFeed } from './utils/storage';
+import { loadAllState, saveTodayAndFeed, saveUserName } from './utils/storage';
 import { EVOLUTION_STAGES } from './data/evolution-stages';
 import { DeviceViewport } from './components/DeviceViewport';
 import TabBar from './components/TabBar';
@@ -41,6 +41,7 @@ function AppInner() {
           result,
           isReady: true,
           showOnboarding: data.isFirstVisit,
+          userName: data.userName,
         },
       });
     };
@@ -52,6 +53,9 @@ function AppInner() {
     const handler = async (e: Event) => {
       const name = (e as CustomEvent<string>).detail;
       const auraResult = getAuraForName(name);
+
+      // Save name for persistent display
+      saveUserName(name);
 
       // Dispatch to show reveal
       dispatch({ type: 'SUBMIT_NAME', payload: { result: auraResult, isNewDiscovery: false } });

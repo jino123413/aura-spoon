@@ -73,6 +73,11 @@ const HomeScreen: React.FC = () => {
 
       </div>
 
+      {/* User name label */}
+      {state.userName && (
+        <p className="text-xs text-[#1A0B3E]/40 mb-1">{state.userName}님의</p>
+      )}
+
       {/* Stage Name + Streak */}
       <div className="flex items-center gap-2 mb-1">
         <span className="text-sm font-bold" style={{ color: mascotAura.themeColor }}>

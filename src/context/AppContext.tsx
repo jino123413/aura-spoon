@@ -16,6 +16,7 @@ const initialState: AppState = {
   isNewDiscovery: false,
   previousEvolutionLevel: 0,
   showOnboarding: false,
+  userName: '',
 };
 
 function appReducer(state: AppState, action: AppAction): AppState {
@@ -34,6 +35,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         result: p.result,
         isReady: true,
         showOnboarding: p.showOnboarding,
+        userName: p.userName,
         overlay: p.result ? 'result' : null,
       };
     }
@@ -43,6 +45,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ...state,
         result: action.payload.result,
         isNewDiscovery: action.payload.isNewDiscovery,
+        userName: action.payload.result.name,
         overlay: 'reveal',
       };
 

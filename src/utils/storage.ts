@@ -23,6 +23,7 @@ const Storage = {
   },
 };
 
+const USERNAME_KEY = 'aura-spoon-username';
 const TODAY_KEY = 'aura-spoon-today';
 const COLLECTION_KEY = 'aura-spoon-collection';
 const STREAK_KEY = 'aura-spoon-streak';
@@ -32,6 +33,14 @@ const FEEDING_LOG_KEY = 'aura-spoon-feeding-log';
 const PROFILE_KEY = 'aura-spoon-profile';
 
 // ── Date helpers ──
+
+// ── User name persistence ──
+export async function saveUserName(name: string): Promise<void> {
+  await Storage.setItem(USERNAME_KEY, name);
+}
+export async function getUserName(): Promise<string> {
+  return (await Storage.getItem(USERNAME_KEY)) || '';
+}
 
 export function getTodayString(): string {
   const now = new Date();
@@ -367,6 +376,7 @@ export async function loadAllState(): Promise<{
   evolutionLevel: EvolutionLevel;
   todayRecord: TodayRecord | null;
   isFirstVisit: boolean;
+  userName: string;
 }> {
   const isFirstVisit = await migrateIfNeeded();
 
@@ -390,8 +400,9 @@ export async function loadAllState(): Promise<{
   const feedingHistory = await getFeedingHistory();
   const evolutionLevel = calcEvolutionLevel(mascot.exp);
   const todayRecord = await getTodayRecord();
+  const userName = await getUserName();
 
-  return { streak, collection, mascot, feedingHistory, evolutionLevel, todayRecord, isFirstVisit };
+  return { streak, collection, mascot, feedingHistory, evolutionLevel, todayRecord, isFirstVisit, userName };
 }
 
 // ── Reroll (pick different aura, no exp change) ──

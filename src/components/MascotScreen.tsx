@@ -91,7 +91,10 @@ const MascotScreen: React.FC = () => {
 
       </div>
 
-      {/* Stage name */}
+      {/* User name + Stage name */}
+      {state.userName && (
+        <p className="text-xs text-[#1A0B3E]/40 mb-0.5">{state.userName}님의</p>
+      )}
       <h2 className="text-lg font-bold mb-1" style={{ color: mascotAura.themeColor }}>
         {stage.name} {mascotAura.name}이
       </h2>

@@ -91,10 +91,11 @@ export interface AppState {
   isNewDiscovery: boolean;
   previousEvolutionLevel: EvolutionLevel;
   showOnboarding: boolean;
+  userName: string;
 }
 
 export type AppAction =
-  | { type: 'INIT'; payload: Omit<AppState, 'activeTab' | 'overlay' | 'selectedAuraId' | 'isNewDiscovery' | 'previousEvolutionLevel' | 'showOnboarding'> & { showOnboarding: boolean } }
+  | { type: 'INIT'; payload: Omit<AppState, 'activeTab' | 'overlay' | 'selectedAuraId' | 'isNewDiscovery' | 'previousEvolutionLevel' | 'showOnboarding' | 'userName'> & { showOnboarding: boolean; userName: string } }
   | { type: 'SUBMIT_NAME'; payload: { result: AuraResult; isNewDiscovery: boolean } }
   | { type: 'REVEAL_COMPLETE' }
   | { type: 'FEED_MASCOT'; payload: { streak: StreakData; collection: ExtendedCollection; mascot: Mascot; feedingHistory: FeedingLog[]; evolutionLevel: EvolutionLevel } }
