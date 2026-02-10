@@ -58,16 +58,16 @@ const ResultScreen: React.FC<{ onRetry: () => void }> = ({ onRetry }) => {
   }, [aura.id, name, showInterstitialAd, dispatch]);
 
   const handleShare = async () => {
+    const shareText = `${name}님의 오늘 기운은 "${aura.name}"이래!\n${aura.keywords.join(' · ')}\n너의 기운도 확인해봐!`;
     try {
-      const { share } = await import('@apps-in-toss/web-framework');
-      await share({
-        message: `${name}님의 기운은 "${aura.name}"이래! ✨ 너의 기운도 확인해봐!`,
-      });
+      const { share, getTossShareLink } = await import('@apps-in-toss/web-framework');
+      const tossLink = await getTossShareLink('intoss://aura-spoon/home');
+      await share({ message: `${shareText}\n${tossLink}` });
     } catch {
       try {
         await navigator.share?.({
           title: '나만의 기운이',
-          text: `${name}님의 기운은 "${aura.name}"이래! ✨ 너의 기운도 확인해봐!`,
+          text: shareText,
         });
       } catch {}
     }
