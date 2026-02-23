@@ -7,6 +7,9 @@ import { useInterstitialAd } from '../hooks/useInterstitialAd';
 import { levelQuotes } from '../data/mascot-dialogues';
 import { SparkleIcon, ShareIcon } from './BrandIcons';
 import GrowthCard from './GrowthCard';
+import BannerAd from './BannerAd';
+
+const BANNER_AD_GROUP_ID = 'ait.v2.live.81917b968b024a2a';
 
 const AD_GROUP_ID = 'ait.v2.live.d247867a61d14ac9';
 
@@ -85,7 +88,7 @@ const ResultScreen: React.FC<{ onRetry: () => void }> = ({ onRetry }) => {
       className="animate-fadeIn font-gmarket fixed inset-0 z-30 overflow-y-auto"
       style={{ background: 'var(--bg)' }}
     >
-      <div className="flex flex-col items-center px-5 pb-10" style={{ paddingTop: 56 }}>
+      <div className="flex flex-col items-center px-5 pb-24" style={{ paddingTop: 56 }}>
 
         {/* New discovery badge */}
         {isNewDiscovery && (
@@ -303,6 +306,11 @@ const ResultScreen: React.FC<{ onRetry: () => void }> = ({ onRetry }) => {
         >
           다른 이름 기운 보기
         </button>
+
+        {/* Banner Ad */}
+        <div className="w-full mt-6">
+          <BannerAd adGroupId={BANNER_AD_GROUP_ID} />
+        </div>
       </div>
     </div>
   );
